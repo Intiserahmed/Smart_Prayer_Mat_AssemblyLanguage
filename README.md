@@ -7,7 +7,7 @@ This project is a simulation of a Smart Sajadah/Prayer Mat using MIPS programmin
 To run this simulation, you will need:
 - MARS Simulator
 - MIPS programming knowledge
-- Understanding of basic electronics and circuits
+
 
 ## Features
 
@@ -26,9 +26,8 @@ To use this simulator, follow these steps:
 2. Open MARS Simulator and load the MIPS program file
 3. Connect the input sensors and output actuators to the appropriate ports on your machine
 4. Run the simulation
-5. Place the Smart Sajadah/Prayer Mat on the floor and begin the prayer
 6. Follow the guidance and feedback provided by the input sensors and output actuators
-7. End the prayer session and reset the rakaah counter
+7. End the prayer session 
 
 ## Contributing
 
@@ -40,4 +39,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Acknowledgements
 
-This project was created as a part of [insert program name or course name] at [insert institution name]. We would like to thank our instructors and mentors for their guidance and support throughout this project.
+This project was created as a part of "Computer Achitecture & Assembly Language" at "IIUM". We would like to thank our instructors and mentors for their guidance and support throughout this project.
