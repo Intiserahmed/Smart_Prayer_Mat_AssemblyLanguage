@@ -2,22 +2,22 @@
     prompt1: .asciiz "Welcome to Smart Prayer System\n"
     prompt2: .asciiz "Has the prayer started? (1 for Yes, 0 for No): "
     prompt3: .asciiz "Enter the number of Rakah you want to pray: "
-    prompt4: .asciiz "Are you standing? (1 for Yes, 0 for No): "
-    prompt5: .asciiz "Has there been any motion change? (1 for Yes, 0 for No): "
+    prompt4: .asciiz "Change Position Detected? (Simulating Pressure Sensor Input) (1 for Yes, 0 for No): "
+    prompt5: .asciiz "Has there been any motion change? (Simulating Motion Sensor Input)(1 for Yes, 0 for No): "
     prompt6: .asciiz "Invalid input. Please try again.\n"
     prompt7: .asciiz "Enter a valid number of Rakah greater than zero: "
     prompt8: .asciiz "Unexpected position change. Please correct your position.\n"
     prompt9: .asciiz "Have you completed the Salaam position? (1 for Yes, 0 for No): "
 
 # Position messages
-position_Takbir: .asciiz "Takbir"
-position_Ruku: .asciiz "Ruku"
-position_Sujud: .asciiz "Sujud"
-position_Jalsa: .asciiz "Jalsa"
-position_Sujud2: .asciiz "Sujud (second prostration)"
-position_Jalsa2: .asciiz "Jalsa (between prostrations)"
-position_Qaida: .asciiz "Qa'ida"
-position_Tashahhud: .asciiz "Tashahhud"
+position_Takbir: .asciiz "Takbir\n"
+position_Ruku: .asciiz "Ruku\n"
+position_Sujud: .asciiz "Sujud\n"
+position_Jalsa: .asciiz "Jalsa\n"
+position_Sujud2: .asciiz "Sujud (second prostration)\n"
+position_Jalsa2: .asciiz "Jalsa (between prostrations)\n"
+position_Qaida: .asciiz "Qa'ida\n"
+position_Tashahhud: .asciiz "Tashahhud\n"
 .text
 main:
     # Print welcome message
