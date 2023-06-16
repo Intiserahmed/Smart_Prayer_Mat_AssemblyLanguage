@@ -12,7 +12,7 @@ sujud: .asciiz "Sujud\n (Actuators/Display) Next Position is : Jalsa\n"
 jalsa: .asciiz "Jalsa\n (Actuators/Display) Next Position is : Qa'ida\n"
 qaida: .asciiz "Qa'ida\n (Actuators/Display) Next Position is : Qiyam\n"
 tashahhud: .asciiz "Tashahhud\n (Actuators/Display) Next Position is : Salam\n"
-salam: .asciiz "Salam\n (Actuators/Display) You Succesfully Completed the Prayer!"
+salam: .asciiz "Salam\n (Actuators/Display) You Succesfully Completed the Prayer! \n........   Sending performed Rakah (Simulating Bluetooth Sensor)"
 promptSalam: .asciiz "Have you completed the Salam position? Press 1 for yes, 0 for no.\n"
 errorInvalidInput: .asciiz "Invalid input. Please try again.\n"
 
