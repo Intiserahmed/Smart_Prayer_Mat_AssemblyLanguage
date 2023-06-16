@@ -2,7 +2,7 @@
 welcomeMsg: .asciiz "!!!!!!!!!!!!!!!! Welcome to the Smart Prayer System !!!!!!!!!!!!!!!!!!! \n"
 promptStart: .asciiz "Has the prayer started? Press 1 for yes, 0 for no.\n"
 promptRakah: .asciiz "How many Rakahs do you want to pray?\n"
-promptStand: .asciiz "Are you currently in the standing position (Simulating Pressure Sensor Input) ? Press 1 for yes, 0 for no.\n"
+promptStand: .asciiz "Are you currently in the standing position (Simulating Pressure Sensor Input) ? Press 0 for yes, 1 for no.\n"
 messageBluetooth: .asciiz " ........   Sending performed rakah count (Simulating Bluetooth Sensor) .......... "
 promptMotion: .asciiz "Has there been any motion change? (Simulating Motion Sensor Input) Press 1 for yes, 0 for no.\n"
 qiyam: .asciiz "Qiyam\n (Actuators/Display) Next Position is : Takbir\n"
