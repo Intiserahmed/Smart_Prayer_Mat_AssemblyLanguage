@@ -1,244 +1,278 @@
 .data
-    prompt1: .asciiz "Welcome to Smart Prayer System\n"
-    prompt2: .asciiz "Has the prayer started? (1 for Yes, 0 for No): "
-    prompt3: .asciiz "Enter the number of Rakah you want to pray: "
-    prompt4: .asciiz "Change Position Detected? (Simulating Pressure Sensor Input) (1 for Yes, 0 for No): "
-    prompt5: .asciiz "Has there been any motion change? (Simulating Motion Sensor Input)(1 for Yes, 0 for No): "
-    prompt6: .asciiz "Invalid input. Please try again.\n"
-    prompt7: .asciiz "Enter a valid number of Rakah greater than zero: "
-    prompt8: .asciiz "Unexpected position change. Please correct your position.\n"
-    prompt9: .asciiz "Have you completed the Salaam position? (1 for Yes, 0 for No): "
+welcomeMsg: .asciiz "!!!!!!!!!!!!!!!! Welcome to the Smart Prayer System !!!!!!!!!!!!!!!!!!! \n"
+promptStart: .asciiz "Has the prayer started? Press 1 for yes, 0 for no.\n"
+promptRakah: .asciiz "How many Rakahs do you want to pray?\n"
+promptStand: .asciiz "Are you Standing (Simulating Pressure Sensor Input) ? Press 1 for yes, 0 for no.\n"
+promptMotion: .asciiz "Has there been any motion change? (Simulating Motion Sensor Input) Press 1 for yes, 0 for no.\n"
+qiyam: .asciiz "Qiyam\n (Actuators/Display) Next Position is : Takbir\n"
+takbir: .asciiz "Takbir\n (Actuators/Display) Next Position is : Ruku\n"
+ruku: .asciiz "Ruku\n (Actuators/Display) Next Position is : Sujud\n"
+sujud: .asciiz "Sujud\n (Actuators/Display) Next Position is : Jalsa\n"
+jalsa: .asciiz "Jalsa\n (Actuators/Display) Next Position is : Qa'ida\n"
+qaida: .asciiz "Qa'ida\n (Actuators/Display) Next Position is : Qiyam\n"
+tashahhud: .asciiz "Tashahhud\n (Actuators/Display) Next Position is : Salam\n"
+salam: .asciiz "Salam\n (Actuators/Display) You Succesfully Completed the Prayer!"
+promptSalam: .asciiz "Have you completed the Salam position? Press 1 for yes, 0 for no.\n"
+errorInvalidInput: .asciiz "Invalid input. Please try again.\n"
 
-# Position messages
-position_Takbir: .asciiz "Takbir\n"
-position_Ruku: .asciiz "Ruku\n"
-position_Sujud: .asciiz "Sujud\n"
-position_Jalsa: .asciiz "Jalsa\n"
-position_Sujud2: .asciiz "Sujud (second prostration)\n"
-position_Jalsa2: .asciiz "Jalsa (between prostrations)\n"
-position_Qaida: .asciiz "Qa'ida\n"
-position_Tashahhud: .asciiz "Tashahhud\n"
 .text
 main:
     # Print welcome message
     li $v0, 4
-    la $a0, prompt1
+    la $a0, welcomeMsg
     syscall
 
-    # Ask if the prayer has started
-    jal askConfirmation
+    # Ask if prayer has started
+askStart:
+    li $v0, 4
+    la $a0, promptStart
+    syscall
 
-    # Input the number of Rakah
-    jal inputRakah
+    # Read user input
+    li $v0, 5
+    syscall
+    move $t0, $v0
 
-    # Set initial variables
-    li $t0, 0     # rakahCount
-    li $t1, 0     # sujudCount
-    li $t2, 0     # position
+    # Check if input is 1 or 0
+    beqz $t0, askStart
+    bne $t0, 1, askStart
 
-prayer_loop:
-    # Ask if the user is standing
-    jal askStanding
+    # Input is 1, proceed to next step
 
+    # Ask how many Rakahs to pray
+askRakah:
+    li $v0, 4
+    la $a0, promptRakah
+    syscall
+
+    # Read user input
+    li $v0, 5
+    syscall
+    move $t1, $v0
+
+    # Check if input is positive and non-zero
+    blez $t1, askRakah
+
+    # Input is valid, proceed to next step
+
+    # Initialize variables
+    li $t2, 0 # rakahCount = 0
+    li $t3, 0 # sujudCount = 0
+    li $t4, 1 # position = Qiyam (represented by numbers from 1 to 7)
+
+prayerLoop:
+    # Check if rakahCount is equal to user input
+    beq $t2, $t1, endLoop
+
+    # Ask if user is standing
+askStand:
+    li $v0, 4
+    la $a0, promptStand
+    syscall
+
+    # Read user input
+    li $v0, 5
+    syscall
+    move $t5, $v0
+
+    # Check if input is 1 or 0
+    beq $t5, 1, prayerLoop
+    beq $t5, 0, motionLoop
+
+    # Invalid input, display error message and repeat askStand
+    li $v0, 4
+    la $a0, errorInvalidInput
+    syscall
+    j askStand
+
+motionLoop:
     # Ask if there has been any motion change
-    jal askMotionChange
-
-    # Check and update position
-    beq $t2, 0, updatePosition_Qiyam
-    beq $t2, 1, updatePosition_Takbir
-    beq $t2, 2, updatePosition_Ruku
-    beq $t2, 3, updatePosition_Sujud
-    beq $t2, 4, updatePosition_Jalsa
-    beq $t2, 5, updatePosition_Sujud2
-    beq $t2, 6, updatePosition_Jalsa2
-    beq $t2, 7, updatePosition_Qaida
-    beq $t2, 8, updatePosition_Tashahhud
-    j handleUnexpectedPosition
-
-updatePosition_Qiyam:
-    li $t2, 1     # position = "Takbir"
+askMotion:
     li $v0, 4
-    la $a0, position_Takbir
-    syscall
-    j incrementSujudCount
-
-updatePosition_Takbir:
-    li $t2, 2     # position = "Ruku"
-    li $v0, 4
-    la $a0, position_Ruku
-    syscall
-    j incrementSujudCount
-
-updatePosition_Ruku:
-    li $t2, 3     # position = "Sujud"
-    li $v0, 4
-    la $a0, position_Sujud
-    syscall
-    j incrementSujudCount
-
-updatePosition_Sujud:
-    li $t2, 4     # position = "Jalsa"
-    li $v0, 4
-    la $a0, position_Jalsa
-    syscall
-    j incrementSujudCount
-
-updatePosition_Jalsa:
-    li $t2, 5     # position = "Sujud2"
-    li $v0, 4
-    la $a0, position_Sujud2
-    syscall
-    j incrementSujudCount
-
-updatePosition_Sujud2:
-    li $t2, 6     # position = "Jalsa2"
-    li $v0, 4
-    la $a0, position_Jalsa2
-    syscall
-    j incrementSujudCount
-
-updatePosition_Jalsa2:
-    li $t2, 7     # position = "Qaida"
-    li $v0, 4
-    la $a0, position_Qaida
-    syscall
-    j incrementSujudCount
-
-updatePosition_Qaida:
-    li $t2, 8     # position = "Tashahhud"
-    li $v0, 4
-    la $a0, position_Tashahhud
-    syscall
-    j incrementSujudCount
-
-updatePosition_Tashahhud:
-    j prayer_loop
-
-handleUnexpectedPosition:
-    li $v0, 4
-    la $a0, prompt8
-    syscall
-    j prayer_loop
-
-incrementSujudCount:
-    beq $t2, 4, incrementSujud
-    j checkRakahCount
-
-incrementSujud:
-    addi $t1, $t1, 1     # sujudCount++
-    bne $t1, 2, checkRakahCount
-    li $t1, 0     # sujudCount = 0
-    addi $t0, $t0, 1     # rakahCount++
-
-checkRakahCount:
-    beq $t0, $t3, endPrayer
-    j prayer_loop
-
-endPrayer:
-    li $t2, 9     # position = "Salaam"
-
-final_position_check:
-    # Ask if the user has completed the Salaam position
-    jal askSalaamCompletion
-
-    # Check if the user completed the Salaam position
-    beq $t4, 1, exitProgram
-    beq $t4, 0, final_position_check
-    j handleInvalidInput
-
-askConfirmation:
-    li $v0, 4
-    la $a0, prompt2
+    la $a0, promptMotion
     syscall
 
+    # Read user input
     li $v0, 5
     syscall
+    move $t6, $v0
 
-    beqz $v0, askConfirmation     # Repeat step 2 if input is 0
-    beq $v0, 1, continueExecution     # Proceed to next step if input is 1
-    j handleInvalidInput     # Handle invalid input and repeat step 2
+    # Check if input is 1 or 0
+    beq $t6, 1, updatePosition
+    beq $t6, 0, motionLoop
 
-continueExecution:
-    jr $ra
-
-inputRakah:
+    # Invalid input, display error message and repeat motionLoop
     li $v0, 4
-    la $a0, prompt3
+    la $a0, errorInvalidInput
+    syscall
+    j motionLoop
+
+updatePosition:
+    # Update position based on current position
+    beq $t4, 1, qiyamToTakbir
+    beq $t4, 2, takbirToRuku
+    beq $t4, 3, rukuToSujud
+    beq $t4, 4, sujudToJalsa
+    beq $t4, 5, jalsaToSujud
+    beq $t4, 6, jalsaToQaida
+
+qiyamToTakbir:
+    # Update position to Takbir (2) and print it
+    li $t4, 2
+    li $v0, 4
+    la $a0, takbir
+    syscall
+    j motionLoop
+
+takbirToRuku:
+    # Update position to Ruku (3) and print it
+    li $t4, 3
+    li $v0, 4
+    la $a0, ruku
+    syscall
+    j motionLoop
+
+rukuToSujud:
+    # Update position to Sujud (4) and print it
+    li $t4, 4
+    li $v0, 4
+    la $a0, sujud
     syscall
 
+    # Increment sujudCount by 1
+    addi $t3, $t3, 1
+
+    j motionLoop
+
+sujudToJalsa:
+    # Update position to Jalsa (5) and print it
+    li $t4, 5
+    li $v0, 4
+    la $a0, jalsa
+    syscall
+
+    # Check if sujudCount is 2
+    beq $t3, 2, jalsaToQaida
+
+    j motionLoop
+
+jalsaToSujud:
+    # Update position to Sujud (4) and print it
+    li $t4, 4
+    li $v0, 4
+    la $a0, sujud
+    syscall
+
+    # Increment sujudCount by 1
+    addi $t3, $t3, 1
+
+    j motionLoop
+
+jalsaToQaida:
+    # Update position to Qa'ida (7) and print it
+    li $t4, 7
+    li $v0, 4
+    la $a0, qaida
+    syscall
+
+    # Increment rakahCount by 1
+    addi $t2, $t2, 1
+
+    # Reset sujudCount to 0
+    li $t3, 0
+
+    j prayerLoop
+
+endLoop:
+    # Ask if there has been any motion change
+askMotionEnd:
+    li $v0, 4
+    la $a0, promptMotion
+    syscall
+
+    # Read user input
     li $v0, 5
     syscall
+    move $t6, $v0
 
-    bgtz $v0, setRakahCount     # If input is positive, proceed to next step
-    j handleInvalidRakahInput     # Handle negative input and repeat step 4
+    # Check if input is 1 or 0
+    beq $t6, 1, updatePositionEnd
+    beq $t6, 0, endLoop
 
-setRakahCount:
-    move $t3, $v0     # rakahCount = input
-    jr $ra
-
-askStanding:
+    # Invalid input, display error message and repeat endLoop
     li $v0, 4
-    la $a0, prompt4
+    la $a0, errorInvalidInput
+    syscall
+    j endLoop
+
+updatePositionEnd:
+    # Update position based on current position
+    beq $t4, 7, qaidaToTashahhud
+
+qaidaToTashahhud:
+    # Update position to Tashahhud (8) and print it
+    li $t4, 8
+    li $v0, 4
+    la $a0, tashahhud
     syscall
 
+    j salamLoop
+
+salamLoop:
+    # Ask if there has been any motion change
+askMotionSalam:
+    li $v0, 4
+    la $a0, promptMotion
+    syscall
+
+    # Read user input
     li $v0, 5
     syscall
+    move $t6, $v0
 
-    beq $v0, 1, continueStanding     # Continue to next step if input is 1
-    beqz $v0, continueStanding     # Continue to next step if input is 0
-    j handleInvalidInput     # Handle invalid input and repeat step 9
+    # Check if input is 1 or 0
+    beq $t6, 1, updatePositionSalam
+    beq $t6, 0, salamLoop
 
-continueStanding:
-    jr $ra
-
-askMotionChange:
+    # Invalid input, display error message and repeat salamLoop
     li $v0, 4
-    la $a0, prompt5
+    la $a0, errorInvalidInput
+    syscall
+    j salamLoop
+
+updatePositionSalam:
+    # Update position based on current position
+    beq $t4, 8, tashahhudToSalam
+
+tashahhudToSalam:
+    # Update position to Salam (9) and print it
+    li $t4, 9
+    li $v0, 4
+    la $a0, salam
     syscall
 
+    # Ask if user has completed the Salaam position
+askSalam:
+    li $v0, 4
+    la $a0, askSalam
+    syscall
+
+    # Read user input
     li $v0, 5
     syscall
+    move $t7, $v0
 
-    beq $v0, 1, continueMotionChange     # Continue to next step if input is 1
-    beqz $v0, askStanding     # Go back to step 9 if input is 0
-    j handleInvalidInput     # Handle invalid input and repeat step 10
+    # Check if input is 1 or 0
+    beq $t7, 1, endProgram
+    beq $t7, 0, salamLoop
 
-continueMotionChange:
-    bne $t2, 0, updatePosition_Takbir     # Check and update position based on the order
-    bne $t2, 1, updatePosition_Ruku
-    bne $t2, 2, updatePosition_Sujud
-    bne $t2, 3, updatePosition_Jalsa
-    bne $t2, 4, updatePosition_Sujud2
-    bne $t2, 5, updatePosition_Jalsa2
-    bne $t2, 6, updatePosition_Qaida
-    bne $t2, 7, updatePosition_Tashahhud
-    j handleUnexpectedPosition     # Handle unexpected position change
-
-askSalaamCompletion:
+    # Invalid input, display error message and repeat salamLoop
     li $v0, 4
-    la $a0, prompt9
+    la $a0, errorInvalidInput
     syscall
+    j salamLoop
 
-    li $v0, 5
-    syscall
-
-    beq $v0, 1, exitProgram     # End the program if input is 1
-    beq $v0, 0, final_position_check     # Repeat step 18 if input is 0
-    j handleInvalidInput     # Handle invalid input and repeat step 18
-
-handleInvalidInput:
-    li $v0, 4
-    la $a0, prompt6
-    syscall
-    j prayer_loop
-
-handleInvalidRakahInput:
-    li $v0, 4
-    la $a0, prompt7
-    syscall
-    j inputRakah
-
-exitProgram:
+endProgram:
+    # Exit the program
     li $v0, 10
     syscall
-
