@@ -1,9 +1,9 @@
 .data
 welcomeMsg: .asciiz "!!!!!!!!!!!!!!!! Welcome to the Smart Prayer System !!!!!!!!!!!!!!!!!!! \n"
 promptStart: .asciiz "Has the prayer started? Press 1 for yes, 0 for no.\n"
-promptRakah: .asciiz "How many Rakahs do you want to pray?\n"
-promptStand: .asciiz "Are you currently in the standing position (Simulating Pressure Sensor Input) ? Press 0 for yes, 1 for no.\n"
-messageBluetooth: .asciiz " ........   Sending performed rakah count (Simulating Bluetooth Sensor) .......... "
+promptRakah: .asciiz "How many Rakahs do you want to pray?"
+promptStand: .asciiz "\nAre you currently in the standing position (Simulating Pressure Sensor Input) ? Press 0 for yes, 1 for no.\n"
+messageBluetooth: .asciiz " ........   Sending performed rakah count (Simulating Bluetooth Sensor) : "
 promptMotion: .asciiz "Has there been any motion change? (Simulating Motion Sensor Input) Press 1 for yes, 0 for no.\n"
 qiyam: .asciiz "Qiyam\n (Actuators/Display) Next Position is : Takbir\n"
 takbir: .asciiz "Takbir\n (Actuators/Display) Next Position is : Ruku\n"
@@ -179,15 +179,15 @@ jalsaToQaida:
     # Increment rakahCount by 1
     addi $t2, $t2, 1
     # Print the value of $t1
-    li $v0, 1       # System call code for printing an integer
-    move $a0, $t1   # Move the value of $t1 to $a0 register (argument for printing)
-    syscall
 
     # Print a message
     li $v0, 4       # System call code for printing a string
     la $a0, messageBluetooth   # Load the address of the message into $a0
     syscall
 
+    li $v0, 1       # System call code for printing an integer
+    move $a0, $t1   # Move the value of $t1 to $a0 register (argument for printing)
+    syscall
     # Reset sujudCount to 0
     li $t3, 0
 
